@@ -1,0 +1,41 @@
+{% extends './base.html' %}
+{% load static %}
+{% block head %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+{% endblock %}
+
+{% block content %}
+<center>
+    <br>
+<form method="post" action="{% url 'weather' %}" class="form-group">
+    <label for="req" style="color:white;">City</label>
+    <input type="text" id="req" name="req" placeholder="City name or PinCode" title="Enter City name or PinCode" required>
+    <button type="submit" class="btn btn-primary">Get Weather</button>
+</form>
+<br>
+{% if city %}
+    <div style="padding: 15px; background:linear-gradient(to right,#ff7300,#000000 );color:white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;width:500px;
+margin: auto;">
+        {% if city.cod %}
+            {{ city.cod }}<br>
+            {{ city.message }}<br>
+        {% else %}
+        City : {{ city.name }}<br>
+        Temperature : {{ city.temperature }}°c&nbsp;<img src="http://openweathermap.org/img/w/{{ city.icon }}.png" alt="image"><br>
+        Country : {{ city.country }}<br>
+        Description : {{ city.description }}<br>
+        {% endif %}
+    </div>
+    <br>
+    <img src="{% static 'static.png' %}" class="img-fluid" width="450" height="450"><br><br>
+    {% else %}
+    <img src="{% static 'static.png' %}" class="img-fluid" width="450" height="450"><br><br>
+{% endif %}
+</center>
+<footer style="padding:10px 10px">
+    <center>
+    <p>Developed By : <a href="https://github.com/karthikeyansa/django-weather-api"target="_blank"> KARTHIKEYAN.S.A </a></p>
+    </center>
+</footer>
+{% endblock %}

@@ -1,0 +1,313 @@
+{% extends './base.html' %}
+{% load apptags %}
+{% load static %}
+{% block head %}
+<title>Welcome</title>
+<style>
+.image-upload>input {
+display: none;
+}
+#profileicon {display:inline-block;margin-right:10px;}
+#postdetail {display:inline-block;}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<h2 class="text-primary">Questions</h2>
+<center>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+       <strong {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %} >
+           {{ message }}</strong><br><br>
+    {% endfor %}
+</ul>
+{% endif %}
+</center>
+<br>
+<div style="padding:20px; background:linear-gradient(to right,#EB3349,#ff4545);  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
+    <h2 class="text-primary">Ask Questions</h2><br>
+    <form action="{% url 'posts' %}" method="post" enctype="multipart/form-data" class="form-group">
+        <label for="title" style="color:white;">Title</label>
+        <input type="text" name="title" id="title" placeholder="Enter Title" title="Enter title" class="form-control" required><br>
+        <label for="body" style="color:white;">Question</label>
+        <textarea name="body" rows="5" id="body" class="form-control" placeholder="Enter Question" required></textarea><br>
+        <div class="image-upload">
+          <label for="file-input" style="color:white;">Upload a screenshot
+            <img src="{% static 'camera.png' %}" class="rounded mx-auto d-block" height="75" width="75" title="Click here to add a screenshot">
+          </label>
+        <input type="file" name="image" id="file-input"><br>
+        </div>
+        <h6 class="text-muted"><i>uploaded image will be seen once you complete your post submission.</i></h6>
+        <label for="tags" style="color:white;">Tags</label>
+        <input type="text" name="tags" class="form-control" id="tags" title="Enter tags" placeholder="Add Tags" required><br>
+        <input type="submit" name="submit" class="btn btn-primary" value="Post your Question"><br>
+    </form>
+</div>
+<br>
+<div style="padding: 15px; background:linear-gradient(to right,#000428,#004e92); box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
+<h3 class="text-primary">Create a Poll</h3>
+<form action="{% url 'createpoll' %}" method="post">
+    <center>
+        <label for ="question" style="color:white;">Question:</label>
+        <textarea class="form-control" name="question" id="question" placeholder="Your Question" aria-label="Enter Question" rows="3" required></textarea>
+        <center><label>Choices</label></center><br>
+        <label for="choice1" class="text-light">Choice 1</label>
+        &nbsp;<input type="text" name="choice1" placeholder = "Enter choice1" id="choice1" title="Enter choice1" required><br>&nbsp;&nbsp;<br>vs<br><br>
+        <label for="choice2" class="text-light">Choice 2</label>
+        &nbsp;&nbsp;<input type="text" name="choice2" placeholder = "Enter choice2" id="choice2" title="Enter choice2" required><br><br>
+        <input type="submit" name="submit" value="Post your Poll" class="btn btn-primary"><br>
+    </center>
+</form>
+</div>
+<br>
+<div style="padding: 15px; background-color: white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
+{% if polls %}
+    <h3 class="text-primary">Trending Polls</h3><br>
+    {% for poll in polls %}
+    <i class="text-muted">
+    Created by&nbsp;<i class="text-primary">{{ poll.owner.username }}</i><br><br>
+    </i>
+    <form method="post" action="{% url 'votingpoll' poll.id %}">
+        <h4>{{ poll.question }}</h4><br>
+        {% if not user|vcheck:poll %}
+            <h4>
+            <input type="radio" name="choice" title="click to vote for {{ poll.choice1 }}" value="{{ poll.choice1 }}" required class="text-primary">&nbsp;{{ poll.choice1 }}<br>
+            <input type="radio" name="choice" value="{{ poll.choice2 }}" title="click to vote for {{ poll.choice2 }}" class="text-danger">&nbsp;{{ poll.choice2 }}<br>
+            <br>
+            </h4>
+                <input type="submit" value="submit" name="submit" class="btn btn-primary">
+        {% else %}
+        <h3 class="text-warning">Already voted</h3><br><br>
+        <h4 class="text-success">Stats&nbsp;</h4><h4 class="text-primary">{{ poll.choice1 }}&nbsp;{{ poll.choice1_total }}<br>{{ poll.choice2 }}&nbsp;{{ poll.choice2_total }}</h4><br>
+        {% endif %}
+        {% if user.id  == poll.owner.id %}
+        <a href="{% url 'deletepoll' poll.id %}" class="btn btn-danger">Delete this poll</a>
+        {% endif %}
+        <br><hr>
+    </form>
+    {% endfor %}
+{% else %}
+<h1>No polls</h1>
+{% endif %}
+</div>
+<br>
+{% if posts %}
+    {% for post in posts %}
+        <div style="padding:20px;background-color: white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
+                <div style="display:inline-block;margin-right:10px;">
+                    {% if post.author.image %}
+                    <img src="{{ post.author.image.url }}" class="rounded-circle" width="75" height="75" style="float:left;padding:5px;">
+                    <div style="display:inline-block;">
+                        <h5 class="text-primary">&nbsp;&nbsp;{{ post.author.username }}</h5>
+                        <h6 class="text-muted">&nbsp;&nbsp;{{ post.timestamp }}</h6>
+                    </div>
+                    {% else %}
+                    <img src="{% static 'default.png' %}" class="rounded-circle" height="75" width="75" style="float:left;padding:5px;">
+                    <div style="display:inline-block;">
+                        <h5 class="text-primary">&nbsp;&nbsp;{{ post.author.username }}</h5>
+                        <h6 class="text-muted">&nbsp;&nbsp;{{ post.timestamp }}</h6>
+                    </div>
+                    {% endif %}
+                </div>
+                <br><hr>
+                <i class="text-primary" style="float:left;">Tags:&nbsp;{{ post.tags }}</i><br>
+                <h4 class="text-danger" style="float:left;"><u>{{ post.title }}</u></h4><br><br>
+                <h4 style = "white-space:pre-wrap;" class="text-dark">{{ post.body }}</h4><br>
+                {% if post.thumbnail %}
+                <img class="img-fluid"  src="{{ post.thumbnail.url }}" alt="No Screenshots"><br><br>
+                {% endif %}
+            <!--under construction-->
+                <script>
+                    console.log(window.location.href);
+                    $(document).ready(function(){
+                    setInterval(function(){
+                          $("#vote{{ post.id }}").load("/welcome #vote{{ post.id }}");
+                    }, 2000);
+                    });
+                    console.log(window.location.href);
+                </script>
+            <!--construction shit-->
+            <h4 class="text-primary" id="vote{{ post.id }}">{{ post|counter }}&nbsp;Votes</h4>
+                <!--Like-->
+                {% if user|check:post %}
+                <div id="post{{ post.id }}"><button type="button" class="btn btn-danger" onclick="unlike{{ post.id }}()">✘</button></div>
+                <!--<a class="btn btn-danger" id="unlike" href="{% url 'likepost' post.id 'unlike' %}">✘</a><br>-->
+                {% else %}
+                <div id="post{{ post.id }}"><button type="button" class="btn btn-success" onclick="like{{ post.id }}()">✔</button></div>
+                <!--<a class="btn btn-success" id="like" href="{% url 'likepost' post.id 'like' %}">✔</a><br>-->
+                {% endif %}
+            <!--shit construction postlike-->
+                <script type="text/javascript">
+                    function like{{ post.id }}(){
+                    console.log("started like {{ post.id }}");
+                    var xhttp = new XMLHttpRequest();
+                    var unlike = "<button type='button' class='btn btn-danger' onclick='unlike{{ post.id }}()'>✘</button>";
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                          document.getElementById("post{{ post.id }}").innerHTML = unlike;
+                        }
+                      };
+                      xhttp.open("GET", "{% url 'likepost' post.id 'like' %}", true);
+                      xhttp.send();
+                      console.log("done like {{ post.id }}");
+                    }
+                </script>
+                <script type="text/javascript">
+                    function unlike{{ post.id }}(){
+                    console.log("started unlike {{ post.id }}");
+                    var xhttp = new XMLHttpRequest();
+                    var like = "<button type='button' class='btn btn-success' onclick='like{{ post.id }}()'>✔</button>";
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                          document.getElementById("post{{ post.id }}").innerHTML = like;
+                        }
+                      };
+                      xhttp.open("GET", "{% url 'likepost' post.id 'unlike' %}", true);
+                      xhttp.send();
+                      console.log("done unlike {{ post.id }}");
+                    }
+                </script>
+                <!--shit construction postlike-->
+                <!-----shit ends here----->
+            <br>
+            <h3 class="text-success" id="commentcount{{ post.id }}">{{ post.comments_set.count }}&nbsp;Answers</h3><br>
+            <script>
+                console.log(window.location.href);
+                $(document).ready(function(){
+                setInterval(function(){
+                      $("#commentcount{{ post.id }}").load("/welcome #commentcount{{ post.id }}");
+                }, 2000);
+                });
+                console.log(window.location.href);
+            </script>
+                <div style="padding:20px;background-color: white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
+                    {% if post.comments_set.all %}
+                        {% for comment in post.comments_set.all %}
+                        <div id="delete{{ comment.id }}">
+                            <div style="display:inline-block;margin-right:10px;">
+                                {% if comment.author.image %}
+                                <img src="{{ comment.author.image.url }}" class="rounded-circle" width="75" height="75" style="float:left;padding:5px;">
+                                <div style="display:inline-block;">
+                                    <h5 class="text-primary">&nbsp;&nbsp;{{ comment.author.username }}</h5>
+                                    <h6 class="text-muted">&nbsp;&nbsp;{{ comment.timestamp }}</h6>
+                                    <h6 class="text-primary" id="commentvote{{ comment.id }}">&nbsp;&nbsp;{{ comment|ccounter }} votes</h6>
+                                    <script>
+                                        console.log(window.location.href);
+                                        $(document).ready(function(){
+                                        setInterval(function(){
+                                              $("#commentvote{{ comment.id }}").load("/welcome #commentvote{{ comment.id }}");
+                                        }, 2000);
+                                        });
+                                        console.log(window.location.href);
+                                    </script>
+                                </div>
+                                {% else %}
+                                {% load static %}
+                                <img src="{% static 'default.png' %}" class="rounded-circle" height="75" width="75" style="float:left;padding:5px;">
+                                <div style="display:inline-block;">
+                                    <h5 class="text-primary">&nbsp;&nbsp;{{ comment.author.username }}</h5>
+                                    <h6 class="text-muted">&nbsp;&nbsp;{{ comment.timestamp }}</h6>
+                                    <h6 class="text-primary" id="commentvote{{ comment.id }}">&nbsp;&nbsp;{{ comment|ccounter }} Votes</h6>
+                                    <script>
+                                        console.log(window.location.href);
+                                        $(document).ready(function(){
+                                        setInterval(function(){
+                                              $("#commentvote{{ comment.id }}").load("/welcome #commentvote{{ comment.id }}");
+                                        }, 2000);
+                                        });
+                                        console.log(window.location.href);
+                                    </script>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="container" style="padding:25px;">
+                                <br>
+                                <h4 class="text-dark" style="white-space:pre-wrap;">{{ comment.body }}</h4>&nbsp;&nbsp;
+                                <br>
+                                <!--like comment-->
+                                {% if comment.author.username == user.username %}
+                                <!--<a class="btn btn-danger" style="display:inline-block;" href="{% url 'deletecomment' comment.id %}" >🗑</a>-->
+                                <button type="button" onclick="deletecomment{{ comment.id }}()" class="btn btn-danger" style="display:inline-block;float:right;">🗑</button>
+                                <script type="text/javascript">
+                                    function deletecomment{{ comment.id }}(){
+                                    console.log("started deletecomment {{ comment.id }}");
+                                    var xhttp = new XMLHttpRequest();
+                                    xhttp.open("GET", "{% url 'deletecomment' comment.id %}", true);
+                                    xhttp.send();
+                                    console.log("done deletecomment {{ comment.id }}");
+                                    }
+                                </script>
+                                {% endif %}
+                                <script>
+                                    console.log(window.location.href);
+                                    $(document).ready(function(){
+                                    setInterval(function(){
+                                          $("#delete{{ comment.id }}").load("/welcome #delete{{ comment.id }}");
+                                    }, 1000);
+                                    });
+                                    console.log(window.location.href);
+                                </script>
+                                {% if user|ccheck:comment %}
+                                <div id="comment{{ comment.id }}"><button type="button" class="btn btn-danger" onclick="unlikecomment{{ comment.id }}()">✘</button></div>
+                                <!--<a href="{% url 'likecomment' comment.id 'unlike' %}" class="btn btn-danger" style="display:inline-block;margin-right:10px;">✘</a>-->
+                                {% else %}
+                                <div id="comment{{ comment.id }}"><button type="button" class="btn btn-success" onclick="likecomment{{ comment.id }}()">✔</button></div>
+                                <!--<a href="{% url 'likecomment' comment.id 'like' %}" class="btn btn-success" style="display:inline-block;margin-right:10px;">✔</a>-->
+                                {% endif %}
+                                <!--shit construction commentlike-->
+                                <script type="text/javascript">
+                                    function likecomment{{ comment.id }}(){
+                                    console.log("started likecomment {{ comment.id }}");
+                                    var xhttp = new XMLHttpRequest();
+                                    var unlike = "<button type='button' class='btn btn-danger' onclick='unlikecomment{{ comment.id }}()'>✘</button>";
+                                    xhttp.onreadystatechange = function() {
+                                        if (this.readyState == 4 && this.status == 200) {
+                                          document.getElementById("comment{{ comment.id }}").innerHTML = unlike;
+                                        }
+                                      };
+                                      xhttp.open("GET", "{% url 'likecomment' comment.id 'like' %}", true);
+                                      xhttp.send();
+                                      console.log("done likecomment {{ comment.id }}");
+                                    }
+                                </script>
+                                <script type="text/javascript">
+                                    function unlikecomment{{ comment.id }}(){
+                                    console.log("started unlikecomment {{ comment.id }}");
+                                    var xhttp = new XMLHttpRequest();
+                                    var like = "<button type='button' class='btn btn-success' onclick='likecomment{{ comment.id }}()'>✔</button>";
+                                    xhttp.onreadystatechange = function() {
+                                        if (this.readyState == 4 && this.status == 200) {
+                                          document.getElementById("comment{{ comment.id }}").innerHTML = like;
+                                        }
+                                      };
+                                      xhttp.open("GET", "{% url 'likecomment' comment.id 'unlike' %}", true);
+                                      xhttp.send();
+                                      console.log("done unlikecomment {{ comment.id }}");
+                                    }
+                                </script>
+                                <!--shit constuction ends here-->
+                                <br>
+                                <hr>
+                            </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                            <h3>No Answers</h3>
+                        <br>
+                    {% endif %}
+                         <form action="{% url 'comments' post.id %}" method="post" class="form-group" enctype="multipart/form-data">
+                            <label for="content">Your Suggestions</label>
+                            <textarea rows="5" id="content" name="body" placeholder="Enter Your Suggestion" class="form-control" required></textarea><br>
+                            <input name="submit" value="Post your Answer" class="btn btn-success" type="submit">
+                        </form>
+                </div>
+        </div>
+        <br>
+{% endfor %}
+{% else %}
+<h1>No Posts</h1>
+{% endif %}
+{% endblock %}
+
