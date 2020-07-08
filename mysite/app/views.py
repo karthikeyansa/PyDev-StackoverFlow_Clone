@@ -308,5 +308,3 @@ def forgot(request):
             messages.add_message(request, messages.ERROR, 'No Search Results Found!')
             return redirect(forgot)
     return render(request,'mysite/forgotpassword.html')
-
-

@@ -29,9 +29,9 @@ MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
 SECRET_KEY = 'fs-f$rh5s%go6^@sa)#kcy9ufg+h0@kf7g(=t=i!+d-_+gaa^s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost:5000']
 
 
 # Application definition
