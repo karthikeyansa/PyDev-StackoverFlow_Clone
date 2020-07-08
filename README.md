@@ -36,7 +36,7 @@ PyDev is an online community where developers share their experience,and help ea
     *uritemplate==3.0.1
     *urllib3==1.25.9
     
-    ## Find Us
+## Find Us
 
 * **[PyDev](https://pydevstackoverflow.pythonanywhere.com/)**
 
