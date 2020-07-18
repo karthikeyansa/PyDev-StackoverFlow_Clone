@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="icon" href="{% static 'logo.png' %}">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <title>Sign In</title>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body>
+<center><h1><u class="text-primary">Welcome To&nbsp;</u><span class="badge badge-dark">PyDev</span></h1>
+<img class="img-fluid" src="{% static 'blueprints.png' %}"/></center>
+<center>
+    <h2><u class="text-primary">Log in to&nbsp;</u><span class="badge badge-dark">PyDev</span></h2><br>
+      <form action="{% url 'login' %}" method = 'POST'>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                   <strong {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %} >
+                       {{ message }}</strong>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    <div class="form-group">
+      <label for ="username"><h3><span class="badge badge-light">👤</span></h3></label>
+      <input type="text" name="username" placeholder="Username" id="username" required>
+    </div>
+    <div class="form-group">
+      <label for ="password"><h3><span class="badge badge-light">🔐</span></h3></label>
+      <input type="password" name="password" placeholder="Password" id="password" required>
+    </div>
+    <div class="form-group">
+    <a href="{% url 'forgot' %}">Forgot Password</a><br>
+    </div>
+    <input class = "btn btn-primary" type="submit"  id = "signin" value="Sign in">
+    <a class="btn btn-warning" href="{% url 'register' %}">Sign up</a>
+    <br>
+    </form> 
+</center>
+<br>
+<footer>
+      <p><a href="https://github.com/karthikeyansa"target="_blank"> PyDev Community </a></p>
+      <p>Contact information: <i>sakarthikeyan59@gmail.com</i></p>
+      <p><a href="https://www.copyrighted.com/work/HbsANpplmxTqO60w"target="_blank"> PyDev Community © 2020.All Rights Reserved .</a></p>
+</footer>
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+</body>
+</html>

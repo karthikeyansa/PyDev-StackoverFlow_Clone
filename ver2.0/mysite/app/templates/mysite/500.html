@@ -1,0 +1,9 @@
+{% extends './base.html' %}
+{% block head %}
+{% load static %}
+    <meta http-equiv="refresh" content="3; URL=https://pydevstackoverflow.pythonanywhere.com/">
+    <title>500 Error</title>
+{% endblock %}
+{% block content %}
+<img src="{% static '500error.png' %}" class="img-fluid">
+{% endblock %}
