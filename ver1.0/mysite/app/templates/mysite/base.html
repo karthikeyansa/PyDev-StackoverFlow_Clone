@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="{% static 'logo.png' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    {% block head %}{% endblock %}
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light" style="background:linear-gradient(to right,#000c91,#000000 ); border-radius: 0px">
+  <a class="navbar-brand" href="/welcome"><span class="btn btn-outline-light my-2 my-sm-0">PyDev</span></a>
+  <button class="navbar-toggler" style="background-color: white;border-radius:0px;" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'home' %}"><button class="btn btn-outline-success my-2 my-sm-0" style="border-radius: 50px">Home</button></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'welcome' %}"><button class="btn btn-outline-warning my-2 my-sm-0" style="border-radius: 50px">Questions</button></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'account' %}"><button class="btn btn-outline-primary my-2 my-sm-0" style="border-radius: 50px">Account</button></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'logout' %}"><button class="btn btn-outline-danger my-2 my-sm-0" style="border-radius: 50px">Logout</button></a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <button class="btn btn-outline-success my-2 my-sm-0" style="border-radius: 50px">Go Social</button></a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="https://www.facebook.com" target="_blank">FaceBook</a>
+          <a class="dropdown-item" href="https://www.instagram.com" target="_blank">Instagram</a>
+          <a class="dropdown-item" href="https://in.linkedin.com" target="_blank">LinkedIn</a>
+          <a class="dropdown-item" href="https://twitter.com" target="_blank">Twitter</a>
+          <a class="dropdown-item" href="https://www.youtube.com" target="_blank">YouTube</a>
+         </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <button class="btn btn-outline-warning my-2 my-sm-0" style="border-radius: 50px">Tech Blogs</button></a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="https://github.com/trending" target="_blank">GitHub Community</a>
+          <a class="dropdown-item" href="https://dev.to/" target="_blank">DEV Community</a>
+          <a class="dropdown-item" href="https://www.freecodecamp.org/news/" target="_blank">FreeCodeCamp</a>
+          <a class="dropdown-item" href="https://www.sitepoint.com/blog" target="_blank">SitePoint</a>
+          <a class="dropdown-item" href="https://www.tympanus.net/codrops" target="_blank">Codrops</a>
+          <a class="dropdown-item" href="https://css-tricks.com" target="_blank">CSS-Tricks</a>
+          </div>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <button class="btn btn-outline-success my-2 my-sm-0" style="border-radius: 50px">Tools</button></a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{% url 'weather' %}">weather</a>
+         </div>
+      </li>
+    </ul>
+    <form action="{% url 'search' %}" class="form-inline my-2 my-md-0">
+    <input class="form-control mr-sm-2" id="searchbar" style="border-radius: 50px" type="text" name ="query" placeholder="🔍 Search with Tags">
+      <button class="btn btn-outline-primary my-2 my-sm-0" style="border-radius: 50px" type="submit">🔍 Search</button>
+    </form>
+  </div>
+</nav>
+<div style="background:linear-gradient(to right,#851481,#990000);;padding:10px 60px;">
+    {% block content %}
+    {% endblock content %}
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+    $('li.active').removeClass('active');
+    $('a[href="' + location.pathname + '"]').closest('li').addClass('active');
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+{% extends './base.html' %}
+{% load apptags %}
+{% block head %}
+<title>Home</title>
+<style>
+#profileicon {display:inline-block;margin-right:10px;}
+#postdetail {display:inline-block;}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<br>
+<h2>Welcome <simple class="text-primary">{{ user.username }}</simple></h2><br>
+<a href="{% url 'posts' %}" class="btn btn-success" style="float:right;">Ask Questions</a>
+<h3 class="text-primary">Your Posts</h3>
+<br>
+<center>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+       <strong {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %} >
+           {{ message }}</strong><br><br>
+    {% endfor %}
+</ul>
+{% endif %}
+</center>
+{% if posts %}
+    {% for post in posts %}
+        <div style="padding:20px;background-color: white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
+            <div style="display:inline-block;margin-right:10px;">
+                {% if post.author.image %}
+                <img src="{{ post.author.image.url }}" class="rounded-circle" width="75" height="75" style="float:left;padding:5px;">
+                <div style="display:inline-block;">
+                    <h5 class="text-primary">&nbsp;&nbsp;{{ post.author.username }}</h5>
+                    <h6 class="text-muted">&nbsp;&nbsp;{{ post.timestamp }}</h6>
+                </div>
+                {% else %}
+                {% load static %}
+                <img src="{% static 'default.png' %}" class="rounded-circle" height="75" width="75" style="float:left;padding:5px;">
+                <div style="display:inline-block;">
+                    <h5 class="text-primary">&nbsp;&nbsp;{{ post.author.username }}</h5>
+                    <h6 class="text-muted">&nbsp;&nbsp;{{ post.timestamp }}</h6>
+                </div>
+                {% endif %}
+             </div>
+                <br><hr>
+                <strong class="text-primary" style="float:left;">{{ post.tags }}</strong><br>
+                <h4 class="text-danger" style="float:left;"><u>{{ post.title }}</u></h4><br><br>
+                <h4 style = "white-space:pre-wrap;" class="text-dark">{{ post.body }}</h4>
+                <br>
+                {% if post.thumbnail %}
+                <img class="img-fluid" src="{{ post.thumbnail.url }}">
+                {% endif %}
+            <br><br>
+            <h5>
+                <big class="text-primary">{{ post|counter }} Votes</big>&nbsp;&nbsp;&nbsp;
+                <big class="text-success">{{ post.comments_set.count }}&nbsp;Answers</big>
+            </h5>
+            <br><br>
+                <a href="{% url 'deletepost' post.id %}" id="deletepost" class="btn btn-danger">🗑️</a>
+                <a href="{% url 'editpost' post.id %}" class="btn btn-warning">✏</a>
+            </div>
+                <br><br>
+     {% endfor %}
+{% else %}
+    <h1>No Posts</h1>
+{% endif %}
+{% endblock %}
