@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    ports:
+      - '3306:3306'
+    environment:
+       MYSQL_DATABASE: 'pydev'
+       MYSQL_USER: 'root'
+       MYSQL_PASSWORD: '1999'
+       MYSQL_ROOT_PASSWORD: '1999'
+  web:
+    build: .
+    command: python src/mysite/manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
