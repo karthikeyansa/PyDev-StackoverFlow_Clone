@@ -7,6 +7,9 @@
 .image-upload>input {
 display: none;
 }
+textarea{
+    resize:none;
+}
 #profileicon {display:inline-block;margin-right:10px;}
 #postdetail {display:inline-block;}
 </style>
@@ -14,7 +17,7 @@ display: none;
 {% endblock %}
 
 {% block content %}
-<h2 class="text-primary">Questions</h2>
+<u style="text-decoration:underline white;"><h2 class="text-light"><i>Questions</i></h2></u>
 <center>
 {% if messages %}
 <ul class="messages">
@@ -27,7 +30,7 @@ display: none;
 </center>
 <br>
 <div style="padding:20px; background:linear-gradient(to right,#EB3349,#ff4545);  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
-    <h2 class="text-primary">Ask Questions</h2><br>
+    <h2 class="text-light"><u>Ask a Questions</u></h2><br>
     <form action="{% url 'posts' %}" method="post" enctype="multipart/form-data" class="form-group">
         <label for="title" style="color:white;">Title</label>
         <input type="text" name="title" id="title" placeholder="Enter Title" title="Enter title" class="form-control" required><br>
@@ -112,7 +115,7 @@ display: none;
     </form>
     {% endfor %}
 {% else %}
-<h1>No polls</h1>
+<h1>No Polls</h1>
 {% endif %}
 </div>
 <br>
@@ -331,7 +334,9 @@ display: none;
         <br>
 {% endfor %}
 {% else %}
+<div style="padding: 15px; background-color: white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
 <h1>No Posts</h1>
+</div>
 {% endif %}
 {% endblock %}
 

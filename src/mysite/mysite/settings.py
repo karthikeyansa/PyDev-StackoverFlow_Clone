@@ -11,7 +11,54 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-from .authentication.authenticate import Email,Password
+import pickle
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from email.mime.text import MIMEText
+import base64
+#Gmail API
+SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+
+def credentials():
+    creds = None
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file('mysite/credentials.json', SCOPES)
+            creds = flow.run_local_server()
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+    return creds
+
+def builder():
+    service = build('gmail', 'v1', credentials=credentials())
+    return service
+
+def create_message(to, subject, message_text):
+  message = MIMEText(message_text,'html')
+  message['to'] = to
+  message['subject'] = subject
+  b64_bytes = base64.urlsafe_b64encode(message.as_bytes())
+  b64_string = b64_bytes.decode()
+  return {'raw': b64_string}
+
+def send_message(to,subject,msgplain):
+    service = builder()
+    msg = create_message(to,subject,msgplain)
+    send_message_internal(service,'me',msg)
+    return None
+
+def send_message_internal(service, user_id, message):
+    message = (service.users().messages().send(userId=user_id, body=message).execute())
+    print('Message Id: %s' % message['id'])
+    return message
+#Build End
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 from django.contrib.messages import constants as message_constants
@@ -29,10 +76,8 @@ MESSAGE_TAGS = {message_constants.DEBUG: 'debug',
 SECRET_KEY = 'fs-f$rh5s%go6^@sa)#kcy9ufg+h0@kf7g(=t=i!+d-_+gaa^s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
-ALLOWED_HOSTS = ['localhost:5000']
-
+DEBUG = True
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -136,10 +181,3 @@ STATIC_ROOT = os.path.join(BASE_DIR,'static')
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR,'static/images')
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST_USER = Email()
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_PASSWORD = Password()

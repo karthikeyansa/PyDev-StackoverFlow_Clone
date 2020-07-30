@@ -11,9 +11,9 @@
 
 {% block content %}
 <br>
-<h2>Welcome <simple class="text-primary">{{ user.username }}</simple></h2><br>
+<u style="text-decoration:underline white;"><h2><simple style="color:white;">Welcome</simple>&nbsp;&nbsp;<i><simple class="text-primary">{{ user.username }}</simple></i></h2></u><br>
 <a href="{% url 'posts' %}" class="btn btn-success" style="float:right;">Ask Questions</a>
-<h3 class="text-primary">Your Posts</h3>
+<h3 class="text-light">Your Posts</h3>
 <br>
 <center>
 {% if messages %}
@@ -64,6 +64,8 @@
                 <br><br>
      {% endfor %}
 {% else %}
-    <h1>No Posts</h1>
+<div style="padding: 15px; background-color: white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
+<h1>No Posts</h1>
+</div>
 {% endif %}
 {% endblock %}

@@ -1,6 +1,11 @@
 {% extends './base.html' %}
 {% block head %}
 <title>Edit post</title>
+<style>
+    textarea{
+    resize:none;
+}
+</style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 {% endblock %}
 
@@ -8,17 +13,17 @@
 <br>
 <h3 class="text-primary">Edit Your Question</h3>
 <br>
-    <div style="padding:20px;background-color: white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
+    <div style="padding:20px; background:linear-gradient(to right,#EB3349,#ff4545); box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
         <form class="form-group" action="{% url 'editpost' post.id %}" method="post" enctype="multipart/form-data">
-            <label for="tags">Tags</label>
+            <label for="tags" class="text-light">Tags</label>
             <input type="text" class="form-control" id="tags" name="tags" value="{{ post.tags }}" required>
-            <label for="title">Title</label>
+            <label for="title" class="text-light">Title</label>
             <input type="text" class="form-control" id="title" name="title" value="{{ post.title }}" required>
-            <label for="body">Question</label>
+            <label for="body" class="text-light">Question</label>
             <textarea rows="5" cols="5" class="form-control" id="body" name="body" required>{{ post.body }}</textarea>
             <br>
             {% if post.thumbnail %}
-            <i class="text-muted">Click below to add a new thumbnail</i>
+            <i class="text-light">Click below to add a new thumbnail</i>
             <div class="image-upload">
                 <label for="image-file">
                         {% if post.thumbnail %}

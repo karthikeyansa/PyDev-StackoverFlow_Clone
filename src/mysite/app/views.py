@@ -1,26 +1,30 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
-from mysite.authentication.authenticate import Email
-from django.core.mail import send_mail
+from mysite.settings import send_message
 from .models import Users,Posts,Comments,Postlike,Commentlike,Polls,PollVote
 from .templatetags.apptags import check,ccheck
 import requests
+
+def error_404_view(request,exception):
+    return render(request,'mysite/404.html',status=404)
+
+def error_500_view(request):
+    return render(request,'mysite/500.html',status=500)
 
 @csrf_exempt
 def login(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        print(password)
         try:
-            user = Users.objects.get(username = username,password = password)
+            user = get_object_or_404(Users,username = username,password = password)
             if user:
                 request.session['user_id'] = user.id
                 messages.add_message(request,messages.SUCCESS,'Logged in successful')
                 return redirect(welcome)
         except:
-            messages.add_message(request,messages.ERROR,'Wrong credentials')
+            messages.add_message(request, messages.ERROR, 'Wrong credentials')
             return redirect(login)
     return render(request,'mysite/login.html')
 
@@ -34,8 +38,8 @@ def register(request):
         if newuser:
             to = email
             subject = 'Hello From PyDev Community'
-            body = 'Hello %s.\n\nThankyou for registering at PyDev.Share us your developer stories,your ups and downs and help us to build a open source community.\n\nYour PyDev account username is "%s".\nYour PyDev account password is "%s".\n\nRegards: PyDev'%(username,username,password,)
-            send_mail(subject=subject,message=body,from_email=Email(),recipient_list=[to],fail_silently=True)
+            body = 'Hello <i>%s</i>.<br><br>Thankyou for registering at <b>PyDev</b>.<br><i>Share us your developer stories,your ups and downs and help us to build a open source community.</i><br><br>Your PyDev account username is <b>"%s"</b>.<br>Your PyDev account password is <b>"%s"</b>.<br><br>Regards: <a href="https://pydevstackoverflow.pythonanywhere.com/"<b>PyDev</b></a>'%(username,username,password,)
+            send_message(to,subject,body)
             newuser.save()
             messages.add_message(request, messages.SUCCESS, 'Account created successfully')
             return redirect(login)
@@ -50,8 +54,17 @@ def welcome(request):
         user = Users.objects.get(id = request.session['user_id'])
         posts = Posts.objects.all().order_by('-timestamp')
         polls = Polls.objects.all().order_by('-id')
-        print(polls)
-        return render(request,'mysite/welcome.html',{'user':user,'posts':posts,'polls':polls})
+        url = 'https://www.trackcorona.live/api/countries/in'
+        r = requests.get(url).json()
+        covid = {
+            'country' : r['data'][0]['location'],
+            'confirmed' : r['data'][0]['confirmed'],
+            'dead' : r['data'][0]['dead'],
+            'recovered' : r['data'][0]['recovered'],
+            'time':r['data'][0]['updated'][:19],
+        }
+        return render(request,'mysite/welcome.html',{'user':user,'posts':posts,'polls':polls,'covid':covid})
+
 
 def logout(request):
     messages.add_message(request, messages.SUCCESS, 'You have logged out Successfully')
@@ -81,31 +94,43 @@ def posts(request):
     return redirect(welcome)
 
 def home(request):
-    user = Users.objects.get(id =request.session['user_id'])
-    posts = Posts.objects.filter(author = user).order_by('-timestamp')
-    return render(request,'mysite/home.html',{'user':user,'posts':posts})
+    try:
+        user = Users.objects.get(id =request.session['user_id'])
+        posts = Posts.objects.filter(author = user).order_by('-timestamp')
+        return render(request,'mysite/home.html',{'user':user,'posts':posts})
+    except:
+        messages.add_message(request, messages.ERROR, 'Wrong credentials')
+        return redirect(login)
 
 def account(request):
-    user = Users.objects.get(id=request.session['user_id'])
-    if request.method == 'POST':
-        image = request.FILES['accountimage']
-        user.image = image
-        user.save()
-        return redirect(account)
-    else:
-        user = Users.objects.get(id =request.session['user_id'])
-        posts = Posts.objects.filter(author = user)
-        return render(request,'mysite/account.html',{'user':user,'posts':posts})
+    try:
+        user = Users.objects.get(id=request.session['user_id'])
+        if request.method == 'POST':
+            image = request.FILES['accountimage']
+            user.image = image
+            user.save()
+            return redirect(account)
+        else:
+            user = Users.objects.get(id =request.session['user_id'])
+            posts = Posts.objects.filter(author = user)
+            return render(request,'mysite/account.html',{'user':user,'posts':posts})
+    except:
+        messages.add_message(request, messages.ERROR, 'Wrong credentials')
+        return redirect(login)
 
 def deleteaccount(request):
-    user = Users.objects.get(id = request.session['user_id'])
-    email = user.email
-    subject = 'Goodbye from PyDev'
-    message = 'Hello %s.\n\nThis email is to confirm that PyDev has DELETED all your user-data from its servers.\n\nThankyou for being a member of PyDev community.\n\nWishing you all the best,%s\nPyDev' % (user.username, user.username)
-    send_mail(subject=subject, message=message, from_email=Email(), recipient_list=[email], fail_silently=True)
-    user.delete(False)
-    messages.add_message(request, messages.SUCCESS, 'Account Deleted Successfully')
-    return redirect(login)
+    try:
+        user = Users.objects.get(id = request.session['user_id'])
+        email = user.email
+        subject = 'Goodbye from PyDev'
+        message = 'Hello <i>%s</i>.<br><br>This email is to confirm that PyDev has DELETED all your user-data from its servers.<br><br>Thankyou for being a member of PyDev community.<br><br>Wishing you all the best&nbsp;<b>%s</b><br><a href="https://pydevstackoverflow.pythonanywhere.com/"<b>PyDev</b></a>' % (user.username, user.username)
+        send_message(email,subject,message)
+        user.delete(False)
+        messages.add_message(request, messages.SUCCESS, 'Account Deleted Successfully')
+        return redirect(login)
+    except:
+        messages.add_message(request, messages.ERROR, 'Wrong credentials')
+        return redirect(login)
 
 @csrf_exempt
 def changepassword(request):
@@ -120,8 +145,8 @@ def changepassword(request):
             messages.add_message(request, messages.SUCCESS, 'Password changed successfully')
             email = user.email
             subject = 'Password Changed From PyDev'
-            message = 'Hello %s.\n\nYour PyDev account password is "%s".\n\nNOTE:If you have not requested password change, your account would have been hacked.Kindly mail us for any queries.\n\nMail ID: impowaste39@gmail.com\n\nRegards: PyDev'%(user.username,user.password,)
-            send_mail(subject=subject, message=message, from_email=Email(), recipient_list=[email], fail_silently=True)
+            message = 'Hello <i>%s</i>.<br><br>Your PyDev account password is <i>"%s"</i>.<br><br>NOTE:If you have not requested password change, your account would have been hacked.Kindly mail us for any queries.<br><br>Mail Us:<a href="mailto:impowaste39@gmail.com">&nbsp;<b>PyDev</b></a><br><br>Regards:&nbsp;<a href="https://pydevstackoverflow.pythonanywhere.com/"><b>PyDev</b></a>'%(user.username,user.password,)
+            send_message(email,subject,message)
             return redirect(account)
         else:
             messages.add_message(request, messages.ERROR, 'Password mismatch or typed current password')
@@ -205,7 +230,6 @@ def search(request):
     posts = Posts.objects.filter(tags__icontains = query)
     if posts.count() == 0:
         img = True
-        messages.add_message(request, messages.ERROR, 'No Results Found')
         return render(request, 'mysite/searchresults.html',{'img':img})
     elif len(query) == 0:
         messages.add_message(request, messages.ERROR, 'No Keyword Found')
@@ -260,7 +284,8 @@ def weather(request):
                 }
             except:
                 city = {'cod': '404',
-                        'message': 'city not found'
+                        'message': 'city not found',
+                        'img':True
                         }
             return render(request, 'mysite/weatherapi.html',{'city':city})
         if req.isalpha():
@@ -290,8 +315,8 @@ def forgot(request):
             password = unknownuser.password
             email = unknownuser.email
             subject = 'Password Recovery From PyDev'
-            message = 'Hello %s.\n\nYour PyDev account password is "%s".\n\nNOTE:If you have not requested password change, your account would have been hacked.Kindly mail us for any queries.\n\nMail ID: impowaste39@gmail.com\n\nRegards: PyDev'%(username,password,)
-            send_mail(subject=subject, message=message, from_email=Email(), recipient_list=[email], fail_silently=True)
+            message = 'Hello <i>%s</i>.<br><br>Your PyDev account password is <b>"%s"</b>.<br><br>NOTE:If you have not requested password change, your account would have been hacked.Kindly mail us for any queries.<br><br>Mail Us:<a href="mailto:impowaste39@gmail.com">&nbsp;<b>PyDev</b></a><br><br>Regards:&nbsp;<a href="https://pydevstackoverflow.pythonanywhere.com/"><b>PyDev</b></a>'%(username,password,)
+            send_message(email,subject,message)
             messages.add_message(request, messages.SUCCESS, 'We have send your password to your registered email account')
             return redirect(forgot)
         elif unknownemail:
@@ -299,9 +324,8 @@ def forgot(request):
             password = unknownemail.password
             email = unknownemail.email
             subject = 'Password Recovery From PyDev'
-            message = 'Hello %s.\n\nYour PyDev account password is "%s".\n\nNOTE:If you have not requested password change, your account would have been hacked.Kindly mail us for any queries.\n\nMail ID: impowaste39@gmail.com\n\nRegards: PyDev' % (
-            username, password,)
-            send_mail(subject=subject, message=message, from_email=Email(), recipient_list=[email], fail_silently=True)
+            message = 'Hello <i>%s</i>.<br><br>Your PyDev account password is <b>"%s"</b>.<br><br>NOTE:If you have not requested password change, your account would have been hacked.Kindly mail us for any queries.<br><br>Mail Us:<a href="mailto:impowaste39@gmail.com">&nbsp;<b>PyDev</b></a><br><br>Regards:&nbsp;<a href="https://pydevstackoverflow.pythonanywhere.com/"><b>PyDev</b></a>' % (username, password,)
+            send_message(email,subject,message)
             messages.add_message(request, messages.SUCCESS,'We have send your password to your registered email account')
             return redirect(forgot)
         else:

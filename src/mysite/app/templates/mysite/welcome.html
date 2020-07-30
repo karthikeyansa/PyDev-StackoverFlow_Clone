@@ -7,6 +7,9 @@
 .image-upload>input {
 display: none;
 }
+textarea{
+    resize:none;
+}
 #profileicon {display:inline-block;margin-right:10px;}
 #postdetail {display:inline-block;}
 </style>
@@ -14,7 +17,7 @@ display: none;
 {% endblock %}
 
 {% block content %}
-<h2 class="text-primary">Questions</h2>
+<u style="text-decoration:underline white;"><h2 class="text-light"><i>Questions</i></h2></u>
 <center>
 {% if messages %}
 <ul class="messages">
@@ -27,7 +30,7 @@ display: none;
 </center>
 <br>
 <div style="padding:20px; background:linear-gradient(to right,#EB3349,#ff4545);  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
-    <h2 class="text-primary">Ask Questions</h2><br>
+    <h2 class="text-light"><u>Ask a Questions</u></h2><br>
     <form action="{% url 'posts' %}" method="post" enctype="multipart/form-data" class="form-group">
         <label for="title" style="color:white;">Title</label>
         <input type="text" name="title" id="title" placeholder="Enter Title" title="Enter title" class="form-control" required><br>
@@ -42,7 +45,7 @@ display: none;
         <h6 class="text-muted"><i>uploaded image will be seen once you complete your post submission.</i></h6>
         <label for="tags" style="color:white;">Tags</label>
         <input type="text" name="tags" class="form-control" id="tags" title="Enter tags" placeholder="Add Tags" required><br>
-        <input type="submit" name="submit" class="btn btn-primary" value="Post your Question"><br>
+        <input type="submit" name="submit" class="btn btn-primary" id="addpost" value="Post your Question"><br>
     </form>
 </div>
 <br>
@@ -61,6 +64,29 @@ display: none;
     </center>
 </form>
 </div>
+<br>
+<div id="covidcases" class="container">
+    <div style="padding: 15px;color:white; background-color:#313632; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
+            <div style="display:inline-block;margin-right:10px;">
+                <a class="btn btn-danger" id="profileicon" href="https://www.trackcorona.live/" target="_blank">COVID-19 alert</a>&nbsp;&nbsp;&nbsp;
+                    <div style="display:inline-block;" >
+                        <marquee>
+                        Country: <strong class="text-primary">{{ covid.country }}</strong>&nbsp;&nbsp;&nbsp;Confirmed : <strong class="text-warning">{{ covid.confirmed }}&nbsp;😢</strong>&nbsp;&nbsp;&nbsp;Dead : <strong class="text-danger">{{ covid.dead }}&nbsp;💀</strong>&nbsp;&nbsp;&nbsp;Recovered : <strong class="text-success">{{ covid.recovered }}&nbsp;😊</strong>&nbsp;&nbsp;&nbsp;Last update : <strong class="text-light">{{ covid.time }}</strong>
+                        </marquee>
+                    </div>
+            </div>
+    </div>
+</div>
+<!--updates every 10 minutes-->
+<script>
+    console.log(window.location.href);
+    $(document).ready(function(){
+    setInterval(function(){
+          $("#covidcases").load("/welcome #covidcases");
+    }, 600000);
+    });
+    console.log(window.location.href);
+</script>
 <br>
 <div style="padding: 15px; background-color: white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
 {% if polls %}
@@ -89,7 +115,7 @@ display: none;
     </form>
     {% endfor %}
 {% else %}
-<h1>No polls</h1>
+<h1>No Polls</h1>
 {% endif %}
 </div>
 <br>
@@ -132,10 +158,10 @@ display: none;
             <h4 class="text-primary" id="vote{{ post.id }}">{{ post|counter }}&nbsp;Votes</h4>
                 <!--Like-->
                 {% if user|check:post %}
-                <div id="post{{ post.id }}"><button type="button" class="btn btn-danger" onclick="unlike{{ post.id }}()">✘</button></div>
+                <div id="post{{ post.id }}"><button type="button" class="btn btn-danger" id="buttonpost{{ post.id }}" onclick="unlike{{ post.id }}()">✘</button></div>
                 <!--<a class="btn btn-danger" id="unlike" href="{% url 'likepost' post.id 'unlike' %}">✘</a><br>-->
                 {% else %}
-                <div id="post{{ post.id }}"><button type="button" class="btn btn-success" onclick="like{{ post.id }}()">✔</button></div>
+                <div id="post{{ post.id }}"><button type="button" class="btn btn-success" id="buttonpost{{ post.id }}" onclick="like{{ post.id }}()">✔</button></div>
                 <!--<a class="btn btn-success" id="like" href="{% url 'likepost' post.id 'like' %}">✔</a><br>-->
                 {% endif %}
             <!--shit construction postlike-->
@@ -143,7 +169,7 @@ display: none;
                     function like{{ post.id }}(){
                     console.log("started like {{ post.id }}");
                     var xhttp = new XMLHttpRequest();
-                    var unlike = "<button type='button' class='btn btn-danger' onclick='unlike{{ post.id }}()'>✘</button>";
+                    var unlike = "<button type='button' class='btn btn-danger' id='buttonpost{{ post.id }}' onclick='unlike{{ post.id }}()'>✘</button>";
                     xhttp.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                           document.getElementById("post{{ post.id }}").innerHTML = unlike;
@@ -158,7 +184,7 @@ display: none;
                     function unlike{{ post.id }}(){
                     console.log("started unlike {{ post.id }}");
                     var xhttp = new XMLHttpRequest();
-                    var like = "<button type='button' class='btn btn-success' onclick='like{{ post.id }}()'>✔</button>";
+                    var like = "<button type='button' class='btn btn-success' id='buttonpost{{ post.id }}' onclick='like{{ post.id }}()'>✔</button>";
                     xhttp.onreadystatechange = function() {
                         if (this.readyState == 4 && this.status == 200) {
                           document.getElementById("post{{ post.id }}").innerHTML = like;
@@ -182,6 +208,7 @@ display: none;
                 });
                 console.log(window.location.href);
             </script>
+            <!--comments section-->
                 <div style="padding:20px;background-color: white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
                     {% if post.comments_set.all %}
                         {% for comment in post.comments_set.all %}
@@ -300,14 +327,16 @@ display: none;
                          <form action="{% url 'comments' post.id %}" method="post" class="form-group" enctype="multipart/form-data">
                             <label for="content">Your Suggestions</label>
                             <textarea rows="5" id="content" name="body" placeholder="Enter Your Suggestion" class="form-control" required></textarea><br>
-                            <input name="submit" value="Post your Answer" class="btn btn-success" type="submit">
+                            <input name="submit" value="Post your Answer" id="addcomment" class="btn btn-success" type="submit">
                         </form>
                 </div>
         </div>
         <br>
 {% endfor %}
 {% else %}
+<div style="padding: 15px; background-color: white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;">
 <h1>No Posts</h1>
+</div>
 {% endif %}
 {% endblock %}
 

@@ -15,22 +15,22 @@
 </form>
 <br>
 {% if city %}
-    <div style="padding: 15px; background:linear-gradient(to right,#ff7300,#000000 );color:white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;width:500px;
-margin: auto;">
         {% if city.cod %}
-            {{ city.cod }}<br>
-            {{ city.message }}<br>
+            {% if not city.img %}
+                <img src="{% static 'dontcry.jpg' %}" class="rounded mx-auto d-block" width="900" height="600"><br><br>
+            {% endif %}
         {% else %}
-        City : {{ city.name }}<br>
-        Temperature : {{ city.temperature }}°c&nbsp;<img src="http://openweathermap.org/img/w/{{ city.icon }}.png" alt="image"><br>
-        Country : {{ city.country }}<br>
-        Description : {{ city.description }}<br>
+            <div style="padding:15px; background-color: #336699;color:white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);;width:500px;margin: auto;">
+                City : {{ city.name }}<br>
+                Temperature : {{ city.temperature }}°c&nbsp;<img src="http://openweathermap.org/img/w/{{ city.icon }}.png" alt="image"><br>
+                Country : {{ city.country }}<br>
+                Description : {{ city.description }}<br><br>
+                <img src="{% static 'static.png' %}" height="400" width="400" title="A Successful API request"><br>
+            </div>
+            <br>
         {% endif %}
-    </div>
-    <br>
-    <img src="{% static 'static.png' %}" class="img-fluid" width="450" height="450"><br><br>
     {% else %}
-    <img src="{% static 'static.png' %}" class="img-fluid" width="450" height="450"><br><br>
+    <img src="{% static 'weather-wallpaper.jpg' %}"><br><br><br>
 {% endif %}
 </center>
 <footer style="padding:10px 10px">

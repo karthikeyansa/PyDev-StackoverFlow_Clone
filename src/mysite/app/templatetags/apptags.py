@@ -1,5 +1,6 @@
 from django import template
 from ..models import Postlike,Posts,Users,Commentlike,Polls,PollVote
+import requests
 register = template.Library()
 
 @register.filter
