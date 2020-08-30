@@ -1,4 +1,4 @@
-# JustAsk-Python_Developers_Community
+# JustAsk-Developers_Community
 
 PyDev is an online community where developers share their experience,and help each other to fix real world problems through Technology.
 
